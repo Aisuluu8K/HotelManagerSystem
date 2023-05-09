@@ -1,3 +1,5 @@
+using HotelManagerSystem.Models.Config;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,3 +25,15 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+Config? BindConfiguration(IServiceProvider provider)
+{
+    var envName = builder.Environment.EnvironmentName;
+
+    var config = new ConfigurationBuilder()
+        .AddJsonFile($"appsettings.json")
+        .Build();
+
+    var configService = config.Get<Config>();
+    return configService;
+}
