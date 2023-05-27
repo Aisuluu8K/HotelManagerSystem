@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Identity;
 
 
-namespace HotelManagerSystem.Models.Entities;
+namespace HotelManagerSystem.Models.Entities
 
-public class Role : IdentityRole
 {
-    
+
+    public class Role : IdentityRole
+    {
+
+    }
 }

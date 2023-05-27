@@ -12,6 +12,7 @@ public class RegisterUserRequest : IRequest<Response>
     [Required] public string FullName { get; set; }
 
     [Required] public string Password { get; set; }
+    public bool IsOwnerRegistration { get; set; }
 
     public override string ToString()
     {

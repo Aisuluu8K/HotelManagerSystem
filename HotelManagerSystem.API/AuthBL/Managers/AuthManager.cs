@@ -88,25 +88,56 @@ namespace HotelManagerSystem.API.AuthBL.Managers
         }
         
 
-        public async Task<Response> RegisterUser(RegisterUserRequest request,
-            CancellationToken cancellationToken)
+        public async Task<Response> RegisterUser(RegisterUserRequest request, CancellationToken cancellationToken)
         {
             if (!await _emailManager.SendEmailAsync(request.Email))
             {
-                return new Response(400, false, "We've already sent the code to your email. Please chek it");
+                return new Response(400, false, "We've already sent the code to your email. Please check it");
             }
 
             var result = await RegisterUser(request);
 
             if (!result.Succeeded)
             {
-                string aggregatedErrorMessages = string.Join("\n", result.Errors
-                    .Select(e => e.Description));
-
+                string aggregatedErrorMessages = string.Join("\n", result.Errors.Select(e => e.Description));
                 throw new DException(aggregatedErrorMessages);
             }
 
             return new Response(200, true, "Initial user created");
+        }
+
+        public async Task<Response> RegisterOwner(RegisterOwnerRequest request, CancellationToken cancellationToken)
+        {
+            if (!await _emailManager.SendEmailAsync(request.Email))
+            {
+                return new Response(400, false, "We've already sent the code to your email. Please check it");
+            }
+
+            var result = await RegisterOwner(request);
+
+            if (!result.Succeeded)
+            {
+                string aggregatedErrorMessages = string.Join("\n", result.Errors.Select(e => e.Description));
+                throw new DException(aggregatedErrorMessages);
+            }
+
+            return new Response(200, true, "Owner registered successfully");
+        }
+
+        private async Task<IdentityResult> RegisterOwner(RegisterOwnerRequest request)
+        {
+            var user = new User();
+            SetUserProperties(user, request.FullName, request.Email);
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+
+            if (result.Succeeded)
+            {
+                // Assign the "Owner" role to the new user
+                await _userManager.AddToRoleAsync(user, "Owner");
+            }
+
+            return result;
         }
 
         public async Task<CurrentUserResponse> GetCurrentUser(ClaimsPrincipal currentUserClaims)
